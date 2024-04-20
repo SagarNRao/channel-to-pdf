@@ -1,15 +1,7 @@
-import json
-import jpype
-import pandas as pd
-
-df = pd.read_csv("csvjson.json")
-df.to_excel("temp.xlsx",index = False)
-
-jpype.startJVM(jpype.getDefaultJVMPath())
-
+import  jpype     
+import  asposecells     
+jpype.startJVM() 
 from asposecells.api import Workbook
-
-workbook = Workbook("temp.xlsx")
-
-workbook.save("Output.pdf",SaveFormat.PDF)
+workbook = Workbook("csvjson.json")
+workbook.save("Outputre.pdf")
 jpype.shutdownJVM()

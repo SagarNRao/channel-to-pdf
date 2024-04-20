@@ -1,13 +1,12 @@
 import asposecells
 import requests
 import json
-
-
 import pywhatkit
-
 import requests
-import json
+import pandas as pd
 
+from subroutines import sidefunctions
+side = sidefunctions('1230967154933891273')
 
 
 class mainfuncs:
@@ -22,12 +21,14 @@ class mainfuncs:
         r = requests.get(
             f'https://discord.com/api/v9/channels/{self.channel_id}/messages?', headers=headers)
         jsonre = json.loads(r.text)
+
+        with open("jsonre.json", 'w') as f:
+            json.dump(jsonre, f, indent=4)
+
         jsonre = jsonre[::-1]
-        for value in jsonre:
-            print(value['content'], '\n')
-            
-        with open('output.json','w') as f:
-            json.dump(jsonre,f)
+        # for value in jsonre:
+        #     print(value['content'], '\n')
+
+        side.convert_to_pdf(jsonre)
+
         # the server sends a GET request to the discord API to get  the messages to show in the server, these messages are not   stored locally
-
-
