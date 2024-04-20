@@ -1,14 +1,9 @@
-import json
-import jpype
-import pandas as pd
-
-df = pd.read_csv("csvjson.json")
-df.to_excel("temp.xlsx",index = False)
-
-jpype.startJVM(jpype.getDefaultJVMPath())
-from asposecells.api import Workbook
-
-workbook = Workbook("temp.xlsx")
-
-workbook.save("Output.pdf",SaveFormat.PDF)
-jpype.shutdownJVM()
+# def get_message(channel_id):
+#     headers = {
+#         'authorization': "NjkxNTY1NDkwMjU4MTgyMTc1.Ggf2Vl._3r45KNvHLdMhG7KZPiJxS2ER3f_qYwJDSe5RY"
+#     }
+#     r = requests.get(
+#         f'https://discord.com/api/v9/channels/{channel_id}/messages?', headers=headers)
+#     jsonre = json.loads(r.text)
+#     for value in jsonre:
+#         print(value['content'], '\n')
