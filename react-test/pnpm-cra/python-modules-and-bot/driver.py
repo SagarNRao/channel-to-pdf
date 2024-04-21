@@ -2,7 +2,11 @@ import discord
 from discord.ext import commands
 import requests
 import json
+from dotenv import load_dotenv
+import os
 from mainmodule import mainfuncs
+
+load_dotenv()
 
 intents = discord.Intents.default()
 client = commands.Bot(command_prefix='!', intents=intents)
@@ -30,4 +34,6 @@ async def on_message(message):
     if message.content.startswith("#history"):
         main.get_message()
 
-client.run('MTIzMDk0ODU4NTQ3NTE0OTg1NQ.GtWRvN.ENdtOwzPS8tfyvutzGKlO0CiA77C08_mExMpz4')
+client.run(os.getenv('TOKEN'))
+
+# client.run('')
