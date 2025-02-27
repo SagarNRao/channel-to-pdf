@@ -4,6 +4,8 @@ import requests
 import json
 from dotenv import load_dotenv
 import os
+from notion_client import Client
+from notion_client import AsyncClient
 
 load_dotenv()
 
@@ -23,64 +25,68 @@ url = "https://api.notion.com/v1/pages"
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 DATABASE_ID = os.getenv("NOTION_DATABASE_ID")
 
+notion = AsyncClient(auth=os.environ["NOTION_API_KEY"])
+
 headers = {
     "Authorization": f"Bearer {NOTION_API_KEY}",
     "Content-Type": "application/json",
     "Notion-Version": "2022-06-28",
 }
 
-
 NOTION_TOKEN = os.getenv("NOTION_API_KEY")
 DATABASE_ID = os.getenv("NOTION_DATABASE_ID")
 headers = {
     "Authorization": "Bearer " + NOTION_TOKEN,
     "Content-Type": "application/json",
-    # Check what is the latest version here: https://developers.notion.com/reference/changes-by-version
     "Notion-Version": "2022-06-28",
 }
 
-
-def makePage(data: dict):
-    create_url = "https://api.notion.com/v1/pages"
-    payload = {"parent": {"database_id": DATABASE_ID}, "properties": data}
-    res = requests.post(create_url, headers=headers, json=payload)
-    if res.status_code == 200:
-        print(f"{res.status_code}: Page created successfully")
-    else:
-        print(f"{res.status_code}: Error during page creation")
-    return res
-
-
-properties = {
-    "Name": {
-        "title": [
-            {
-                "text": {
-                    "content": "Discord Channel Export"
-                }
+async def makePage():
+    data = {
+        "parent": {
+            "page_id": "1a1176890f35803caac2e994f6415d8a"
+        },
+        "properties": {
+            "title": {
+                "type": "title",
+                "title": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "A note from your pals at Notion"
+                        }
+                    }
+                ]
             }
-        ]
-    },
-    "Content": {
-        "rich_text": [
+        },
+        "children": [
             {
-                "text": {
-                    "content": "somebody once told me the wooooorld is gonna roll me i aint hte sharpest tool in the sheeeeed"
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": "You made this page using the Notion API. Pretty cool, huh? We hope you enjoy building with us."
+                            }
+                        }
+                    ]
                 }
             }
         ]
     }
-}
 
+    response = await notion.pages.create(**data)
+    return response
 
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user}')
 
-
 @client.event
 async def on_message(message):
-    global startingMessageID, endingMessageID, messages, properties
+    global startingMessageID, endingMessageID, messages
 
     if message.author.bot:
         return  # Ignore bot messages
@@ -109,11 +115,11 @@ async def on_message(message):
                         for attachment in msg.attachments:
                             if attachment.content_type.startswith('image/'):
                                 content += f'\nImage: {attachment.url}'
-                    makePage(content)
+                    await makePage()
                     await message.channel.send(content)
             except discord.NotFound:
                 await message.channel.send("Could not find one of the messages. Please check the IDs.")
         else:
             await message.channel.send('Please set both starting and ending message IDs first.')
 
-client.run(os.getenv('TOKEN')) 
+client.run(os.getenv('TOKEN'))
